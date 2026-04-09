@@ -78,7 +78,7 @@ function saveData() {
 // ========== CHARACTERS ==========
 const CHARACTERS = [
     { id: 'patapin', name: 'Br Br Patapin', price: 0, img: imgPatapin },
-    { id: 'tunglung', name: 'Tung Tung Sahur', price: 150, img: imgSahur },
+    { id: 'tungtung', name: 'Tung Tung Sahur', price: 150, img: imgSahur },
     { id: 'tralala',   name: 'Tralalero Tralala',    price: 200, color: '#e08030', skin: '#f0c080', nose: false },
     { id: 'tunglung',  name: 'Tung Tung Sahur',      price: 300, color: '#4a4a6a', skin: '#7a7a9a', nose: false },
     { id: 'lirili',    name: 'Lirili Larila',        price: 250, color: '#d060a0', skin: '#f0b0d0', nose: false },
@@ -354,135 +354,27 @@ function drawTitle(y) {
 
 // ========== DRAW CHIBI CHARACTER (for menu preview & game) ==========
 function drawCharAt(cx, cy, scale, charId, anim) {
+    // 1. On trouve quel personnage est sélectionné
     let ch = CHARACTERS.find(c => c.id === charId) || CHARACTERS[0];
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.scale(scale, Math.abs(scale));
 
-    let t = anim || menuBob * 3;
-    let bob = Math.sin(t * 0.8) * 2;
+    // 2. Si le personnage a une image (img), on l'affiche
+    if (ch.img) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        
+        // On gère l'orientation (gauche/droite)
+        ctx.scale(scale, 1); 
+        
+        // On ajoute un petit effet de "bobbing" (rebond) pour que ce soit vivant
+        let bob = Math.sin((anim || menuBob * 3) * 0.8) * 5;
 
-    // Feet
-    for (let side = -1; side <= 1; side += 2) {
-        ctx.fillStyle = ch.skin; ctx.strokeStyle = '#5a3a1a'; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.ellipse(side*12, 30+bob*0.3, 13, 6.5, side*0.1, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = shadeColor(ch.skin, 15);
-        for (let toe = -2; toe <= 2; toe++) {
-            ctx.beginPath(); ctx.arc(side*12+toe*4+side*3, 35+bob*0.3, 2.8, 0, Math.PI*2); ctx.fill();
-        }
+        // On dessine l'image (centrée sur le personnage)
+        // -30, -30 : on décale pour que le centre de l'image soit le point de rotation
+        // 60, 60 : c'est la taille de l'affichage de ton image
+        ctx.drawImage(ch.img, -30, -30 + bob, 60, 60);
+
+        ctx.restore();
     }
-    // Legs
-    for (let side = -1; side <= 1; side += 2) {
-        ctx.strokeStyle = '#6a4a28'; ctx.lineWidth = 6; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(side*7, 10); ctx.quadraticCurveTo(side*10, 20+bob*0.5, side*12, 25+bob*0.3); ctx.stroke();
-        ctx.strokeStyle = ch.color; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.moveTo(side*8, 12); ctx.bezierCurveTo(side*12, 16, side*7, 20, side*11, 24); ctx.stroke();
-    }
-    // Arms
-    let armAnim = Math.sin(t * 0.6) * 5;
-    for (let side = -1; side <= 1; side += 2) {
-        ctx.strokeStyle = '#6a4a28'; ctx.lineWidth = 5; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(side*18, -5+bob); ctx.quadraticCurveTo(side*26, 5+side*armAnim+bob, side*22, 16+bob); ctx.stroke();
-        ctx.strokeStyle = ch.color; ctx.lineWidth = 1.8;
-        ctx.beginPath(); ctx.moveTo(side*19, -3+bob); ctx.bezierCurveTo(side*28, 4+side*armAnim+bob, side*20, 10+bob, side*23, 15+bob); ctx.stroke();
-        ctx.strokeStyle = '#7a5a38'; ctx.lineWidth = 2.5;
-        for (let f = 0; f < 3; f++) { ctx.beginPath(); ctx.moveTo(side*22, 16+bob); ctx.lineTo(side*(23+f*2), 21+f*0.5+bob); ctx.stroke(); }
-    }
-    // Body
-    ctx.fillStyle = ch.skin; ctx.strokeStyle = '#5a3a1a'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.ellipse(0, 3+bob, 18, 14, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-    // Moss collar
-    ctx.fillStyle = ch.color;
-    for (let i = 0; i < 12; i++) {
-        let a = (i/12)*Math.PI*2;
-        ctx.beginPath(); ctx.ellipse(Math.cos(a)*17, -5+bob+Math.sin(a)*5, 5, 3.5, a*0.3, 0, Math.PI*2); ctx.fill();
-    }
-    ctx.fillStyle = shadeColor(ch.color, 30);
-    for (let i = 0; i < 8; i++) {
-        let a = (i/8)*Math.PI*2+0.3;
-        ctx.beginPath(); ctx.arc(Math.cos(a)*16, -5+bob+Math.sin(a)*4, 2.5, 0, Math.PI*2); ctx.fill();
-    }
-    // Head
-    ctx.fillStyle = 'rgba(0,0,0,0.08)';
-    ctx.beginPath(); ctx.ellipse(2, -16+bob, 24, 22, 0, 0, Math.PI*2); ctx.fill();
-    let hg = ctx.createRadialGradient(-4, -20+bob, 5, 0, -16+bob, 26);
-    hg.addColorStop(0, shadeColor(ch.skin, 40)); hg.addColorStop(0.7, ch.skin); hg.addColorStop(1, shadeColor(ch.skin, -20));
-    ctx.fillStyle = hg;
-    ctx.beginPath(); ctx.ellipse(0, -17+bob, 23, 21, 0, 0, Math.PI*2); ctx.fill();
-    ctx.strokeStyle = '#6a4a2a'; ctx.lineWidth = 2.2;
-    ctx.beginPath(); ctx.ellipse(0, -17+bob, 23, 21, 0, 0, Math.PI*2); ctx.stroke();
-    // Blush
-    ctx.fillStyle = 'rgba(255,150,120,0.25)';
-    ctx.beginPath(); ctx.ellipse(-16, -10+bob, 5, 3.5, 0, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(12, -10+bob, 4, 3, 0, 0, Math.PI*2); ctx.fill();
-
-    // Eyes
-    for (let side = -1; side <= 1; side += 2) {
-        let ex = side === -1 ? -9 : 9, ey = -18 + bob;
-        let sz = side === -1 ? 1 : 0.85;
-        ctx.fillStyle = '#fff'; ctx.strokeStyle = '#3a2a1a'; ctx.lineWidth = 1.8;
-        ctx.beginPath(); ctx.ellipse(ex, ey, 9*sz, 10*sz, 0, 0, Math.PI*2); ctx.fill(); ctx.stroke();
-        let ig = ctx.createRadialGradient(ex+side, ey, 1.5, ex+side, ey+1, 6*sz);
-        ig.addColorStop(0, '#6a4a20'); ig.addColorStop(0.6, '#4a3010'); ig.addColorStop(1, '#2a1808');
-        ctx.fillStyle = ig;
-        ctx.beginPath(); ctx.arc(ex+side, ey+1, 5.5*sz, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#0a0804';
-        ctx.beginPath(); ctx.arc(ex+side, ey+1, 3*sz, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#fff';
-        ctx.beginPath(); ctx.ellipse(ex-1.5*side, ey-2, 2.8*sz, 3.2*sz, -0.2, 0, Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.arc(ex+2*side, ey+3, 1.2*sz, 0, Math.PI*2); ctx.fill();
-    }
-
-    // Nose (only patapin has big nose, others get small cute nose)
-    if (ch.nose) {
-        let ng = ctx.createRadialGradient(2, -10+bob, 3, 2, -8+bob, 14);
-        ng.addColorStop(0, shadeColor(ch.skin, 20)); ng.addColorStop(1, shadeColor(ch.skin, -20));
-        ctx.fillStyle = ng;
-        ctx.beginPath();
-        ctx.moveTo(-2, -22+bob); ctx.bezierCurveTo(6,-20+bob,13,-14+bob,12,-6+bob);
-        ctx.bezierCurveTo(11,-1+bob,6,2+bob,2,0+bob); ctx.bezierCurveTo(-2,-2+bob,-4,-8+bob,-3,-14+bob);
-        ctx.fill();
-        ctx.strokeStyle = '#7a5530'; ctx.lineWidth = 1.5;
-        ctx.beginPath(); ctx.moveTo(-2,-22+bob); ctx.bezierCurveTo(6,-20+bob,13,-14+bob,12,-6+bob);
-        ctx.bezierCurveTo(11,-1+bob,6,2+bob,2,0+bob); ctx.stroke();
-        ctx.fillStyle = '#6a4020';
-        ctx.beginPath(); ctx.ellipse(7,-3+bob,2.5,1.5,0.3,0,Math.PI*2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(3,-1+bob,2,1.2,-0.2,0,Math.PI*2); ctx.fill();
-    } else {
-        ctx.fillStyle = shadeColor(ch.skin, -15);
-        ctx.beginPath(); ctx.ellipse(0, -10+bob, 3, 2.5, 0, 0, Math.PI*2); ctx.fill();
-    }
-
-    // Mouth
-    ctx.strokeStyle = '#4a2810'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(-2, -7+bob, 5, 0.2, Math.PI-0.3); ctx.stroke();
-
-    // Brow
-    ctx.fillStyle = shadeColor(ch.skin, -10);
-    ctx.beginPath(); ctx.ellipse(-8, -27+bob, 10, 3.5, -0.05, 0, Math.PI); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(8, -26+bob, 8, 3, 0.05, 0, Math.PI); ctx.fill();
-
-    // Hair
-    let hairDark = shadeColor(ch.color, -30), hairMid = ch.color, hairLight = shadeColor(ch.color, 40);
-    let hair = [
-        {x:-16,y:-33,r:10},{x:-6,y:-37,r:11},{x:5,y:-36,r:10},{x:14,y:-32,r:9},
-        {x:-18,y:-27,r:7},{x:-1,y:-39,r:8},{x:10,y:-38,r:7},{x:-10,y:-37,r:8},{x:17,y:-35,r:7},
-        {x:-20,y:-30,r:6},{x:20,y:-29,r:6},
-    ];
-    ctx.fillStyle = hairDark;
-    hair.forEach(h => { ctx.beginPath(); ctx.arc(h.x, h.y+bob, h.r, 0, Math.PI*2); ctx.fill(); });
-    ctx.fillStyle = hairMid;
-    hair.forEach(h => { ctx.beginPath(); ctx.arc(h.x+0.5, h.y-1.5+bob, h.r*0.75, 0, Math.PI*2); ctx.fill(); });
-    ctx.fillStyle = hairLight;
-    hair.forEach((h,i) => { if(i%2===0){ctx.beginPath(); ctx.arc(h.x+1,h.y-3+bob,h.r*0.4,0,Math.PI*2); ctx.fill();} });
-    ctx.strokeStyle = shadeColor(ch.color, -50); ctx.lineWidth = 1;
-    hair.forEach(h => { ctx.beginPath(); ctx.arc(h.x, h.y+bob, h.r, 0, Math.PI*2); ctx.stroke(); });
-    // Hanging vines
-    ctx.strokeStyle = shadeColor(ch.color, -15); ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(-20,-25+bob); ctx.quadraticCurveTo(-23,-18+bob,-19,-12+bob); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(19,-27+bob); ctx.quadraticCurveTo(23,-20+bob,20,-14+bob); ctx.stroke();
-
-    ctx.restore();
 }
 
 // ========== DRAW GAME PLAYER ==========
