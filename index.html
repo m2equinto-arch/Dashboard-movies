@@ -7,18 +7,26 @@
 <title>Films Cultes — Dashboard</title>
 <style>
   :root {
-    --bg: #fafaf7;
+    /* Un fond très légèrement gris pour faire ressortir les cartes blanches */
+    --bg: #f8f9fa; 
     --surface: #ffffff;
-    --surface-2: #f1efe8;
-    --text: #2c2c2a;
-    --text-muted: #5f5e5a;
-    --border: rgba(0,0,0,0.12);
-    --border-strong: rgba(0,0,0,0.22);
-    --accent: #378ADD;
-    --danger: #A32D2D;
-    --star: #BA7517;
-    --radius: 10px;
-    --radius-lg: 14px;
+    --surface-2: #f1f3f5;
+  
+  /* Un texte bien contrasté mais pas 100% noir pour le confort */
+    --text: #1a1a1a;
+    --text-muted: #636e72;
+  
+  /* Des bordures très fines et légères */
+    --border: rgba(0, 0, 0, 0.05);
+    --border-strong: rgba(0, 0, 0, 0.1);
+  
+  /* Des couleurs d'accentuation plus "cinéma" */
+    --accent: #007aff;    /* Un bleu plus vif style iOS */
+    --danger: #eb4d4b;    /* Un rouge plus moderne */
+    --star: #f1c40f;      /* Un jaune d'or pur */
+  
+    --radius: 12px;       /* Des coins un peu plus arrondis pour le style */
+    --radius-lg: 18px;
   }
   @media (prefers-color-scheme: dark) {
     :root {
